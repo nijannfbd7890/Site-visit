@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WRM Report Analysis Dashboard</title>
+
+<style>
+body {
+  background: #f5f6fa;
+  font-family: "Poppins", sans-serif;
+  color: #222;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+header {
+  width: 100%;
+  background: linear-gradient(90deg, #1e3a8a, #22398a);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 40px;
+}
+.logo-left, .logo-right {
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  background-color: white;
+  object-fit: cover;
+  border: 2px solid #f5b301;
+}
+.header-title {
+  flex: 1;
+  text-align: center;
+}
+.header-title h1 {
+  font-size: 1.8rem;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: 700;
+  color: #fff;
+}
+.header-title span {
+  font-size: 1.1rem;
+  color: #fdd835;
+  font-weight: 600;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  background: #eaf0ff;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+nav a {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-weight: 600;
+  background: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: 0.3s ease;
+  border: 1px solid #c5cae9;
+}
+nav a:hover,
+nav a.active {
+  background: #1e3a8a;
+  color: #fff;
+  transform: scale(1.03);
+}
+.main-wrapper {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 50px 25px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+footer {
+  text-align: center;
+  color: #666;
+  padding: 15px;
+  font-size: 0.9rem;
+  border-top: 1px solid #ddd;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-container">
+    <img src="https://raw.githubusercontent.com/nijannfbd7890/WRM/main/LOGO.png" class="logo-left" />
+    <div class="header-title">
+      <h1>
+        Namma Family Builder and Developer Pvt. Ltd<br>
+        Site Visit Dashboard<br>
+        <span>Team - Marketing Management</span>
+      </h1>
+    </div>
+    <img src="https://raw.githubusercontent.com/nijannfbd7890/WRM/main/cs.jpg" class="logo-right" />
+  </div>
+</header>
+
+<nav>
+  <a href="index.html" class="active">🏠 Dashboard</a>
+  <a href="Teamwise Range.html">📊 Teamwise Range</a>
+  <a href="budget-range.html">💼 Staffwise Range</a>
+</nav>
+
+<div class="main-wrapper">
+  <h2>Welcome to WRM Report Analysis Dashboard</h2>
+  <p style="font-size:1.1rem; color:#444;">
+    Please choose a section from the menu above to view detailed reports.
+  </p>
+</div>
+
+<footer>
+  © 2025 Namma Family Builder & Developer Pvt. Ltd — All Rights Reserved
+</footer>
+</body>
+</html>
