@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Teamwise Range - WRM Dashboard</title>
 
-<!-- Script Libraries -->
+<!-- Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
@@ -53,8 +53,6 @@ header {
   color: #fdd835;
   font-weight: 600;
 }
-
-/* Main wrapper */
 .main-wrapper {
   max-width: 1200px;
   margin: 25px auto 40px;
@@ -63,8 +61,6 @@ header {
   border-radius: 18px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
-
-/* Filter bar */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -72,26 +68,21 @@ header {
   gap: 10px;
   margin-bottom: 25px;
 }
-.filter-bar select, .filter-bar input {
+.filter-bar input, .filter-bar button {
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
 }
 .filter-bar button {
-  padding: 8px 16px;
   background: #1e3a8a;
   color: #fff;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
 }
-.filter-bar button:hover {
-  background: #2a4ed0;
-}
+.filter-bar button:hover { background: #2a4ed0; }
 
-/* Cards */
 .summary-row {
   display: flex;
   flex-wrap: wrap;
@@ -129,20 +120,10 @@ header {
   padding: 2px 6px;
   border-radius: 6px;
 }
-.subcounts .below {
-  background: #ffcccc;
-  color: #000;
-}
-.subcounts .above {
-  background: #c9f7c1;
-  color: #000;
-}
+.subcounts .below { background: #ffcccc; color: #000; }
+.subcounts .above { background: #c9f7c1; color: #000; }
 
-/* Table */
-.table-wrapper {
-  overflow-x: auto;
-  margin-top: 20px;
-}
+.table-wrapper { overflow-x: auto; margin-top: 20px; }
 #staffTable {
   width: 100%;
   border-collapse: collapse;
@@ -170,31 +151,8 @@ header {
 #staffTable tbody tr:nth-child(3n+1) { background-color: #fff8e1; }
 #staffTable tbody tr:nth-child(3n+2) { background-color: #e3f2fd; }
 #staffTable tbody tr:nth-child(3n+3) { background-color: #f1f8e9; }
-#staffTable tbody tr:last-child {
-  background-color: #fdd835 !important;
-  font-weight: 700;
-  color: #000;
-}
-#staffTable th:nth-child(3),
-#staffTable th:nth-child(4),
-#staffTable th:nth-child(5),
-#staffTable td:nth-child(3),
-#staffTable td:nth-child(4),
-#staffTable td:nth-child(5) {
-  background-color: #fff8e1 !important;
-}
-#staffTable th:nth-child(6),
-#staffTable td:nth-child(6) {
-  background-color: #e3f2fd;
-}
-#staffTable th:nth-child(7),
-#staffTable th:nth-child(8),
-#staffTable th:nth-child(9),
-#staffTable td:nth-child(7),
-#staffTable td:nth-child(8),
-#staffTable td:nth-child(9) {
-  background-color: #f1f8e9;
-}
+#staffTable tbody tr:last-child { background-color: #fdd835 !important; font-weight: 700; color: #000; }
+
 .chart-container {
   margin-top: 30px;
   padding: 15px;
@@ -204,11 +162,6 @@ header {
   height: 400px;
 }
 .chart-container h3 { margin-bottom: 10px; }
-#staffTable tbody tr:last-child td {
-  background-color: #fdd835 !important;
-  font-weight: 700;
-  color: #000;
-}
 </style>
 </head>
 
@@ -228,34 +181,19 @@ header {
 </header>
 
 <div class="main-wrapper">
-
-  <!-- Filters -->
   <div class="filter-bar">
-    <!-- Temporarily disabled dropdowns -->
-    <!--
-    <select id="yearFilter" disabled><option value="">Select Year</option></select>
-    <select id="monthFilter" disabled><option value="">Select Month</option></select>
-    -->
     <input type="date" id="startDate" />
     <input type="date" id="endDate" />
     <button onclick="applyFilters()">Apply Filter</button>
   </div>
 
   <div class="summary-row">
-    <div class="summary-card">
-      <h3>Total Site Visits</h3>
-      <p id="totalSiteVisits">0</p>
-    </div>
-    <div class="summary-card">
-      <h3>Total Actual TOTAL SQ-FT</h3>
-      <p id="totalSqft">0</p>
-    </div>
-    <div class="summary-card">
-      <h3>Total Visits (Above/Below)</h3>
-      <p id="totalVisits">0</p>
+    <div class="summary-card"><h3>Total Site Visits</h3><p id="totalSiteVisits">0</p></div>
+    <div class="summary-card"><h3>Total Actual TOTAL SQ-FT</h3><p id="totalSqft">0</p></div>
+    <div class="summary-card"><h3>Total Visits (Above/Below)</h3><p id="totalVisits">0</p>
       <div class="subcounts">
-        <span class="below">Below: <span id="belowCount">0</span></span>
-        <span class="above">Above: <span id="aboveCount">0</span></span>
+        <span class="below">Below 8: <span id="belowCount">0</span></span>
+        <span class="above">Above 8: <span id="aboveCount">0</span></span>
       </div>
     </div>
   </div>
@@ -265,12 +203,20 @@ header {
       <thead>
         <tr><th colspan="10">Team Wise WRM Achieved (%) Report</th></tr>
         <tr>
-          <th rowspan="2">S.No</th><th rowspan="2">Team Name</th>
+          <th rowspan="2">S.No</th>
+          <th rowspan="2">Team Name</th>
           <th colspan="3">Site Visit</th>
           <th rowspan="2">Target Sq.ft</th>
           <th colspan="3">Overall Booking</th>
         </tr>
-        <tr><th>Below 8</th><th>Above 8</th><th>Total</th><th>Count</th><th>Sqft</th><th>% (Percentage)</th></tr>
+        <tr>
+          <th>Below 8</th>
+          <th>Above 8</th>
+          <th>Total</th>
+          <th>Count</th>
+          <th>Sqft</th>
+          <th>% (Percentage)</th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -291,24 +237,126 @@ const CSV_VISIT = "https://nijannfbd7890.github.io/Site-visit/SITE_VISIT.csv";
 let allMainRows  = [];
 let allVisitRows = [];
 
-// --- all your normalization, canonicalKey, and buildTeamReport functions stay exactly as before ---
+const teamTargets = {
+  "Ashok Sir": 15100,
+  "Gopi Sir": 3000,
+  "Kumaresan Sir": 5700,
+  "Latha Mam & Ayyappan Sir": 17400,
+  "Prabhakaran Sir": 7300,
+  "Rajiv Sir": 10100,
+  "Ranjith Sir": 16500,
+  "Sankar Sir": 5100,
+  "Senthil Sir": 8500,
+  "Suriya Sir & Selvakumar Sir": 15600,
+  "Thangadurai Sir": 17100
+};
 
-function applyFilters() {
-  if (!allVisitRows.length || !allMainRows.length) return;
-  const start = document.getElementById("startDate").value;
-  const end   = document.getElementById("endDate").value;
+function buildInitialTable() {
+  const tbody = document.querySelector("#staffTable tbody");
+  tbody.innerHTML = "";
+  let sno = 1, totalTarget = 0;
+  Object.entries(teamTargets).forEach(([teamName, target]) => {
+    totalTarget += target;
+    tbody.innerHTML += `
+      <tr>
+        <td>${sno++}</td>
+        <td>${teamName}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>${target}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>`;
+  });
+  tbody.innerHTML += `
+    <tr>
+      <td colspan="2">Grand Total</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td>${totalTarget}</td>
+      <td>0</td><td>0</td><td>0%</td>
+    </tr>`;
+}
 
-  const filter = (rows, col) => rows.filter(r => {
-    const d = new Date(r[col]);
-    if (!d || isNaN(d)) return false;
-    if (start && d < new Date(start)) return false;
-    if (end   && d > new Date(end)) return false;
-    return true;
+// ---- Real computation starts only after Apply Filter ----
+function buildTeamReport(mainRows, visitRows) {
+  const agg = {};
+  mainRows.forEach(r => {
+    const teamName = r["Team Name"] || r["TEAM NAME"];
+    if (!teamName) return;
+    const key = teamName.trim();
+    if (!agg[key]) agg[key] = { below: 0, above: 0, count: 0, sqft: 0 };
+    agg[key].count += parseFloat(r["No of Plots"] || 0);
+    agg[key].sqft += parseFloat(r["Actual TOTAL SQ-FT"] || 0);
   });
 
-  const filteredMain  = filter(allMainRows,  "SITE VISIT DATE");
-  const filteredVisit = filter(allVisitRows, "DATE");
-  buildTeamReport(filteredMain, filteredVisit);
+  visitRows.forEach(r => {
+    const teamName = r["Team Name"] || r["TEAM NAME"];
+    if (!teamName) return;
+    const key = teamName.trim();
+    if (!agg[key]) agg[key] = { below: 0, above: 0, count: 0, sqft: 0 };
+    const type = String(r["Above/Below"] || r["Above /below"] || "").toLowerCase();
+    if (type.includes("below")) agg[key].below++;
+    else if (type.includes("above")) agg[key].above++;
+  });
+
+  const tbody = document.querySelector("#staffTable tbody");
+  tbody.innerHTML = "";
+  let sno = 1, tb=0, ta=0, tt=0, tc=0, ts=0, totalTarget=0;
+  Object.entries(teamTargets).forEach(([teamName, target]) => {
+    const d = agg[teamName] || { below: 0, above: 0, count: 0, sqft: 0 };
+    const total = d.below + d.above;
+    const pct = target > 0 ? Math.min(((d.sqft / target) * 100), 100).toFixed(0) : 0;
+    tb += d.below; ta += d.above; tt += total; tc += d.count; ts += d.sqft; totalTarget += target;
+    tbody.innerHTML += `
+      <tr>
+        <td>${sno++}</td>
+        <td>${teamName}</td>
+        <td>${d.below}</td>
+        <td>${d.above}</td>
+        <td>${total}</td>
+        <td>${target}</td>
+        <td>${d.count}</td>
+        <td>${d.sqft}</td>
+        <td>${pct}%</td>
+      </tr>`;
+  });
+
+  const grandPct = totalTarget > 0 ? Math.min((ts / totalTarget) * 100, 100).toFixed(0) : 0;
+  tbody.innerHTML += `
+    <tr>
+      <td colspan="2">Grand Total</td>
+      <td>${tb}</td><td>${ta}</td><td>${tt}</td>
+      <td>${totalTarget}</td><td>${tc}</td><td>${ts}</td><td>${grandPct}%</td>
+    </tr>`;
+
+  document.getElementById("belowCount").textContent = tb;
+  document.getElementById("aboveCount").textContent = ta;
+  document.getElementById("totalVisits").textContent = tt;
+  document.getElementById("totalSiteVisits").textContent = tt;
+  document.getElementById("totalSqft").textContent = ts.toFixed(2);
+}
+
+// ---- Apply Filter ----
+function applyFilters() {
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+  if (!start || !end) {
+    alert("Please select both start and end dates!");
+    return;
+  }
+
+  const filter = (rows, dateColNames) => rows.filter(r => {
+    const dateStr = r["Date"] || r["SITE VISIT DATE"] || r["Site Visit Date"];
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    return d >= new Date(start) && d <= new Date(end);
+  });
+
+  const fm = filter(allMainRows, ["Site Visit Date"]);
+  const fv = filter(allVisitRows, ["Date"]);
+  buildTeamReport(fm, fv);
 }
 
 Papa.parse(CSV_MAIN, {
@@ -323,12 +371,11 @@ Papa.parse(CSV_MAIN, {
       skipEmptyLines: true,
       complete: resVisit => {
         allVisitRows = resVisit.data;
-        buildTeamReport(allMainRows, allVisitRows);
+        buildInitialTable(); // Only basic data shown initially
       }
     });
   }
 });
 </script>
-
 </body>
 </html>
