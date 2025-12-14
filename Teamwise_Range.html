@@ -53,6 +53,8 @@ header {
   color: #fdd835;
   font-weight: 600;
 }
+
+/* Main wrapper */
 .main-wrapper {
   max-width: 1200px;
   margin: 25px auto 40px;
@@ -61,6 +63,35 @@ header {
   border-radius: 18px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.filter-bar select, .filter-bar input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+.filter-bar button {
+  padding: 8px 16px;
+  background: #1e3a8a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.filter-bar button:hover {
+  background: #2a4ed0;
+}
+
+/* Cards */
 .summary-row {
   display: flex;
   flex-wrap: wrap;
@@ -87,6 +118,28 @@ header {
   font-weight: 600;
   color: #000;
 }
+.subcounts {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 5px;
+  font-size: 0.95rem;
+}
+.subcounts span {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.subcounts .below {
+  background: #ffcccc;
+  color: #000;
+}
+.subcounts .above {
+  background: #c9f7c1;
+  color: #000;
+}
+
+/* Table */
 .table-wrapper {
   overflow-x: auto;
   margin-top: 20px;
@@ -115,6 +168,75 @@ header {
   background: #f5b301;
   color: #000;
 }
+
+/* Alternating row colors for better readability */
+#staffTable tbody tr:nth-child(3n+1) {
+  background-color: #fff8e1; /* light yellow */
+}
+
+#staffTable tbody tr:nth-child(3n+2) {
+  background-color: #e3f2fd; /* light blue */
+}
+
+#staffTable tbody tr:nth-child(3n+3) {
+  background-color: #f1f8e9; /* light green */
+}
+
+/* Highlight the Grand Total row */
+#staffTable tbody tr:last-child {
+  background-color: #fdd835 !important;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Distinct background colors per table section */
+
+/* 🟡 Site Visit section */
+#staffTable th:nth-child(3),
+#staffTable th:nth-child(4),
+#staffTable th:nth-child(5),
+#staffTable td:nth-child(3),
+#staffTable td:nth-child(4),
+#staffTable td:nth-child(5) {
+  background-color: #fff8e1; /* Light yellow */
+}
+
+/* 🔵 Target Sq.ft column */
+#staffTable th:nth-child(6),
+#staffTable td:nth-child(6) {
+  background-color: #e3f2fd; /* Light blue */
+}
+
+/* 🟢 Overall Booking section */
+#staffTable th:nth-child(7),
+#staffTable th:nth-child(8),
+#staffTable th:nth-child(9),
+#staffTable td:nth-child(7),
+#staffTable td:nth-child(8),
+#staffTable td:nth-child(9) {
+  background-color: #f1f8e9; /* Light green */
+}
+/* 🟡 Same color for all three "Site Visit" columns */
+#staffTable th:nth-child(3),
+#staffTable th:nth-child(4),
+#staffTable th:nth-child(5),
+#staffTable td:nth-child(3),
+#staffTable td:nth-child(4),
+#staffTable td:nth-child(5) {
+  background-color: #fff8e1 !important; /* light yellow */
+}
+
+
+/* 🟨 Grand Total row */
+#staffTable tbody tr:last-child {
+  background-color: #fdd835 !important;
+  font-weight: 700;
+  color: #000;
+}
+
+
+
+/* Chart */
 .chart-container {
   margin-top: 30px;
   padding: 15px;
@@ -123,6 +245,17 @@ header {
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   height: 400px;
 }
+.chart-container h3 {
+  margin-bottom: 10px;
+}
+
+/* 🔸 Grand Total row - single color across all columns */
+#staffTable tbody tr:last-child td {
+  background-color: #fdd835 !important; /* solid yellow */
+  font-weight: 700;
+  color: #000;
+}
+
 </style>
 </head>
 
@@ -142,14 +275,36 @@ header {
 </header>
 
 <div class="main-wrapper">
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <select id="yearFilter">
+      <option value="">Select Year</option>
+    </select>
+    <select id="monthFilter">
+      <option value="">Select Month</option>
+    </select>
+    <input type="date" id="startDate" />
+    <input type="date" id="endDate" />
+    <button onclick="applyFilters()">Apply Filter</button>
+  </div>
+
   <div class="summary-row">
     <div class="summary-card">
-      <h3>Total Teams</h3>
-      <p id="totalTeams">0</p>
+      <h3>Total Site Visits</h3>
+      <p id="totalSiteVisits">0</p>
     </div>
     <div class="summary-card">
       <h3>Total Actual TOTAL SQ-FT</h3>
       <p id="totalSqft">0</p>
+    </div>
+    <div class="summary-card">
+      <h3>Total Visits (Above/Below)</h3>
+      <p id="totalVisits">0</p>
+      <div class="subcounts">
+        <span class="below">Below: <span id="belowCount">0</span></span>
+        <span class="above">Above: <span id="aboveCount">0</span></span>
+      </div>
     </div>
   </div>
 
@@ -157,22 +312,22 @@ header {
     <table id="staffTable">
       <thead>
         <tr>
-          <th colspan="11">Team Wise WRM Achieved (%) Report</th>
+          <th colspan="10">Team Wise WRM Achieved (%) Report</th>
         </tr>
         <tr>
           <th rowspan="2">S.No</th>
           <th rowspan="2">Team Name</th>
           <th colspan="3">Site Visit</th>
           <th rowspan="2">Target Sq.ft</th>
-          <th rowspan="2">Count</th>
-          <th rowspan="2">Sqft</th>
-          <th rowspan="2">% (Percentage)</th>
-          <th rowspan="2">Target Achieved (%)</th>
+          <th colspan="3">Overall Booking</th>
         </tr>
         <tr>
           <th>Below 8</th>
           <th>Above 8</th>
           <th>Total</th>
+          <th>Count</th>
+          <th>Sqft</th>
+          <th>% (Percentage)</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -188,8 +343,12 @@ header {
 <footer>© 2025 Namma Family Builder & Developer Pvt. Ltd — All Rights Reserved</footer>
 
 <script>
-const CSV_MAIN = "https://nijannfbd7890.github.io/Site-visit/workbook.csv";
+const CSV_MAIN  = "https://nijannfbd7890.github.io/Site-visit/workbook.csv";
 const CSV_VISIT = "https://nijannfbd7890.github.io/Site-visit/SITE_VISIT.csv";
+
+let allMainRows  = [];
+let allVisitRows = [];
+let teamChart = null;
 
 const teamTargets = {
   "Mr.Suriya Sir & Selva Kumar Sir": 15600,
@@ -205,170 +364,189 @@ const teamTargets = {
   "Mr.Kumaresan sir": 5700
 };
 
-Papa.parse(CSV_MAIN, {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: resultsMain => {
-    Papa.parse(CSV_VISIT, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: resultsVisit => buildTeamReport(resultsMain.data, resultsVisit.data),
-      error: () => alert("Failed to load SITE_VISIT.csv.")
-    });
-  },
-  error: () => alert("Failed to load workbook.csv.")
-});
-
-let teamChartInstance = null;
-
-function buildTeamReport(rowsMain, rowsVisit) {
-  if (!rowsMain?.length) return;
-  const normalize = s => (s || "").trim().toLowerCase().replace(/\s+/g, '');
-
-  const firstRow = rowsMain[0];
-  const keys = Object.keys(firstRow);
-  const teamKey = keys.find(k => normalize(k) === "teamname" || normalize(k) === "team name");
-  const sqftKey = keys.find(k => normalize(k).startsWith("actualtotalsq-ft"));
-
-  if (!teamKey || !sqftKey) {
-    alert("workbook.csv must include TEAM NAME and Actual TOTAL SQ-FT columns");
-    return;
+function parseExcelDate(str) {
+  if (!str) return null;
+  str = String(str).trim();
+  if (!str) return null;
+  const match = str.match(/^(\d{1,2})[-\s]([A-Za-z]{3,})[-\s](\d{2,4})$/);
+  if (match) {
+    let [, day, mon, year] = match;
+    const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+    const mIndex = months.indexOf(mon.toLowerCase());
+    if (mIndex >= 0) {
+      if (year.length === 2) year = "20" + year;
+      return new Date(Number(year), mIndex, Number(day));
+    }
   }
+  const parsed = new Date(str);
+  return isNaN(parsed) ? null : parsed;
+}
 
-  const teamData = {};
-  rowsMain.forEach(r => {
-    const team = (r[teamKey] || "").trim();
-    if (!team) return;
-    const sqft = parseFloat((r[sqftKey] || "0").replace(/,/g, "")) || 0;
-    if (!teamData[team]) teamData[team] = { sqft: 0, count: 0 };
-    teamData[team].sqft += sqft;
-    teamData[team].count += 1;
+function normalizeTeamName(name) {
+  if (!name) return "";
+  let n = String(name).toLowerCase();
+  n = n.replace(/[.&]/g, " ");
+  n = n.replace(/\b(mr|mrs|sir|madam|mam)\b/g, " ");
+  n = n.replace(/&/g, " ");
+  let tokens = n.split(/\s+/).filter(t => t.length > 2);
+  tokens = Array.from(new Set(tokens));
+  tokens.sort();
+  return tokens.join(" ");
+}
+
+function toNumber(val) {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "string") {
+    val = val.replace(/,/g, "").replace(/\..*$/, "").trim();
+    if (val === "") return 0;
+  }
+  const num = parseFloat(val);
+  return isNaN(num) ? 0 : num;
+}
+
+function populateFilters(rows) {
+  const dateCol = "DATE";
+  const validDates = rows.map(r => parseExcelDate(r[dateCol])).filter(Boolean);
+  if (!validDates.length) return;
+  const years  = [...new Set(validDates.map(d => d.getFullYear()))].sort();
+  const months = [...new Set(validDates.map(d => d.getMonth() + 1))].sort();
+  const yearSel  = document.getElementById("yearFilter");
+  const monthSel = document.getElementById("monthFilter");
+  yearSel.innerHTML  = '<option value="">Select Year</option>';
+  monthSel.innerHTML = '<option value="">Select Month</option>';
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSel.appendChild(opt);
+  });
+  months.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = new Date(0, m - 1).toLocaleString("default", { month: "long" });
+    monthSel.appendChild(opt);
+  });
+}
+
+function buildTeamReport(mainRows, visitRows) {
+  const mainAgg = {};
+  mainRows.forEach(r => {
+    const key = normalizeTeamName(r["TEAM NAME"]);
+    if (!key) return;
+    if (!mainAgg[key]) mainAgg[key] = { teamName: (r["TEAM NAME"] || "").trim(), count: 0, sqft: 0 };
+    const bucket = mainAgg[key];
+    bucket.count += toNumber(r["NO OF PLOTS"] ?? r["Count"]);
+    bucket.sqft += toNumber(r["Actual TOTAL SQ-FT"] ?? r["Sqft"]);
   });
 
-  const visitData = {};
-  rowsVisit.forEach(v => {
-    const team = (v["TEAM NAME"] || "").trim();
-    const category = (v["Above /below"] || "").trim().toLowerCase();
-    if (!team) return;
-    if (!visitData[team]) visitData[team] = { below: 0, above: 0 };
-    if (category.includes("below")) visitData[team].below += 1;
-    else if (category.includes("above")) visitData[team].above += 1;
+  const visitAgg = {};
+  visitRows.forEach(r => {
+    const key  = normalizeTeamName(r["TEAM NAME"]);
+    if (!key) return;
+    if (!visitAgg[key]) visitAgg[key] = { teamName: (r["TEAM NAME"] || "").trim(), below: 0, above: 0 };
+    const bucket = visitAgg[key];
+    const type = String(r["Above /below"] || "").toLowerCase();
+    if (type.includes("below")) bucket.below++;
+    else if (type.includes("above")) bucket.above++;
   });
 
-  const entries = Object.entries(teamData).sort((a, b) => b[1].sqft - a[1].sqft);
-  const totalSqft = entries.reduce((sum, [, v]) => sum + v.sqft, 0);
-
-  document.getElementById("totalTeams").textContent = entries.length;
-  document.getElementById("totalSqft").textContent = Math.round(totalSqft).toLocaleString("en-IN");
-
+  const allKeys = Array.from(new Set([...Object.keys(mainAgg), ...Object.keys(visitAgg)])).sort();
   const tbody = document.querySelector("#staffTable tbody");
   tbody.innerHTML = "";
 
-  let totalBelow = 0, totalAbove = 0, totalVisits = 0, totalCount = 0, totalAchievedSum = 0, teamsWithTarget = 0;
+  let totalBelow=0,totalAbove=0,totalVisits=0,totalTarget=0,totalCount=0,totalSqft=0;
 
-  entries.forEach(([team, { sqft, count }], i) => {
-    const percent = totalSqft ? (sqft / totalSqft) * 100 : 0;
-    totalCount += count;
+  allKeys.forEach((key,index)=>{
+    const main=mainAgg[key]||{teamName:(visitAgg[key]&&visitAgg[key].teamName)||"",count:0,sqft:0};
+    const visit=visitAgg[key]||{teamName:main.teamName,below:0,above:0};
+    const below=visit.below||0;
+    const above=visit.above||0;
+    const total=below+above;
+    const fixedTarget=teamTargets[main.teamName?.trim()]||teamTargets[visit.teamName?.trim()];
+    const targetSqft=fixedTarget?toNumber(fixedTarget):0;
+    const count=toNumber(main.count);
+    const sqft=toNumber(main.sqft);
+    const percentage=targetSqft>0?Math.round((sqft/targetSqft)*100):0;
 
-    const teamClean = normalize(team);
-    let target = 0;
-    for (const [key, value] of Object.entries(teamTargets)) {
-      if (teamClean.includes(normalize(key)) || normalize(key).includes(teamClean)) {
-        target = value;
-        break;
-      }
-    }
+    totalBelow+=below;
+    totalAbove+=above;
+    totalVisits+=total;
+    totalTarget+=targetSqft;
+    totalCount+=count;
+    totalSqft+=sqft;
 
-    let below = 0, above = 0;
-    for (const [key, val] of Object.entries(visitData)) {
-      if (teamClean.includes(normalize(key)) || normalize(key).includes(teamClean)) {
-        below = val.below;
-        above = val.above;
-        break;
-      }
-    }
-    const total = below + above;
-    totalBelow += below;
-    totalAbove += above;
-    totalVisits += total;
-
-    const achieved = target > 0 ? (sqft / target) * 100 : 0;
-    if (target > 0) {
-      totalAchievedSum += achieved;
-      teamsWithTarget++;
-    }
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td style="text-align:left;padding-left:10px;">${team}</td>
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${index+1}</td>
+      <td>${main.teamName||visit.teamName||key}</td>
       <td>${below}</td>
       <td>${above}</td>
       <td>${total}</td>
-      <td>${target ? target.toLocaleString("en-IN") : "-"}</td>
-      <td>${count}</td>
-      <td>${Math.round(sqft).toLocaleString("en-IN")}</td>
-      <td>${percent.toFixed(1)}%</td>
-      <td>${target ? achieved.toFixed(1) + "%" : "-"}</td>`;
+      <td>${Math.round(targetSqft)}</td>
+      <td>${Math.round(count)}</td>
+      <td>${Math.round(sqft)}</td>
+      <td>${percentage}</td>
+    `;
     tbody.appendChild(tr);
   });
 
-  const avgAchieved = teamsWithTarget > 0 ? (totalAchievedSum / teamsWithTarget).toFixed(1) : "-";
-  const trTotal = document.createElement("tr");
-  trTotal.style.fontWeight = "bold";
-  trTotal.style.background = "#fff8dc";
-  trTotal.innerHTML = `
-    <td colspan="2">Grand Total</td>
+  const grandRow=document.createElement("tr");
+  grandRow.style.fontWeight="bold";
+  grandRow.style.backgroundColor="#fdd835";
+  grandRow.innerHTML=`
+    <td colspan="2" style="text-align:center;">Grand Total</td>
     <td>${totalBelow}</td>
     <td>${totalAbove}</td>
     <td>${totalVisits}</td>
-    <td>-</td>
+    <td>${totalTarget}</td>
     <td>${totalCount}</td>
-    <td>${Math.round(totalSqft).toLocaleString("en-IN")}</td>
-    <td>100%</td>
-    <td>${avgAchieved}%</td>`;
-  tbody.appendChild(trTotal);
+    <td>${totalSqft}</td>
+    <td></td>
+  `;
+  tbody.appendChild(grandRow);
 
-  renderChart(entries, totalSqft);
+  document.getElementById("belowCount").textContent=totalBelow;
+  document.getElementById("aboveCount").textContent=totalAbove;
+  document.getElementById("totalVisits").textContent=totalVisits;
+  document.getElementById("totalSiteVisits").textContent=totalVisits;
+  document.getElementById("totalSqft").textContent=totalSqft;
 }
 
-function renderChart(entries, totalSqft) {
-  const labels = entries.map(([team]) => team);
-  const data = entries.map(([, obj]) => obj.sqft);
-  const ctx = document.getElementById("teamChart").getContext("2d");
-  if (teamChartInstance) teamChartInstance.destroy();
-
-  teamChartInstance = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Actual TOTAL SQ-FT",
-        data,
-        backgroundColor: "#f5b301",
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true } },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const sqft = ctx.raw;
-              const percent = totalSqft ? (sqft / totalSqft) * 100 : 0;
-              return `${sqft.toLocaleString("en-IN")} Sq.ft (${percent.toFixed(1)}%)`;
-            }
-          }
-        }
-      }
-    }
+function applyFilters(){
+  if(!allVisitRows.length||!allMainRows.length)return;
+  const year=document.getElementById("yearFilter").value;
+  const month=document.getElementById("monthFilter").value;
+  const startDate=document.getElementById("startDate").value;
+  const endDate=document.getElementById("endDate").value;
+  const filter=(rows,col)=>rows.filter(r=>{
+    const d=parseExcelDate(r[col]);
+    if(!d)return false;
+    if(year&&d.getFullYear().toString()!==year)return false;
+    if(month&&(d.getMonth()+1).toString()!==month)return false;
+    if(startDate&&d<new Date(startDate))return false;
+    if(endDate&&d>new Date(endDate))return false;
+    return true;
   });
+  const filteredMain=filter(allMainRows,"SITE VISIT DATE");
+  const filteredVisit=filter(allVisitRows,"DATE");
+  buildTeamReport(filteredMain,filteredVisit);
 }
+
+Papa.parse(CSV_MAIN,{
+  download:true,header:true,skipEmptyLines:true,
+  complete:resMain=>{
+    allMainRows=resMain.data;
+    Papa.parse(CSV_VISIT,{
+      download:true,header:true,skipEmptyLines:true,
+      complete:resVisit=>{
+        allVisitRows=resVisit.data;
+        populateFilters(allVisitRows);
+        buildTeamReport(allMainRows,allVisitRows);
+      }
+    });
+  }
+});
 </script>
+
 </body>
 </html>
