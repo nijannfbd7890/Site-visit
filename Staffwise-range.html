@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Staff Wise Range Achieved (%) Report</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<style>
+body{font-family:Poppins;background:#f4f6f9;margin:0}
+.header{background:#1f3c88;color:#fff;padding:25px;text-align:center}
+.subheader{background:#1f3c88;color:#fff;text-align:center;padding-bottom:15px}
+.container{padding:20px}
+.filters{display:flex;justify-content:center;gap:10px;margin:20px}
+.filters input,.filters button{padding:8px 12px;border-radius:6px;border:1px solid #ccc}
+.filters button{background:#1f3c88;color:#fff;cursor:pointer}
+.summary{display:flex;gap:20px;justify-content:center;margin-bottom:20px}
+.box{background:#fff;padding:10px 20px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+thead th{background:#f4b400;color:#000}
+tbody tr:nth-child(even){background:#e3f2fd}
+tbody tr:nth-child(odd){background:#fff8e1}
+tfoot tr{background:#fdd835;font-weight:bold}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  background: #eaf0ff;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+nav a {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-weight: 600;
+  background: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: 0.3s ease;
+  border: 1px solid #c5cae9;
+}
+nav a:hover,
+nav a.active {
+  background: #1e3a8a;
+  color: #fff;
+  transform: scale(1.03);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>Staff Wise Range Achieved (%) Report</h1>
+  <h3>Namma Family Builder and Developer Pvt. Ltd</h3>
+  <p>Team - Marketing Management</p>
+</div>
+<nav>
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="Teamwise Range.html">📊 Teamwise Range</a>
+  <a href="Staffwise-range.html" class="active">💼 Staffwise Range</a>
+</nav>
+
+<div class="container">
+
+<div class="filters">
+  <input type="date" id="fromDate">
+  <input type="date" id="toDate">
+  <button onclick="applyFilter()">Apply Filter</button>
+</div>
+
+<div class="summary">
+  <div class="box">Total Site Visits: <b id="svTotal">0</b></div>
+  <div class="box">Below 8: <b id="svBelow">0</b></div>
+  <div class="box">Above 8: <b id="svAbove">0</b></div>
+  <div class="box">Booking Count: <b id="bkCount">0</b></div>
+  <div class="box">Total Sqft: <b id="bkSqft">0</b></div>
+</div>
+
+<table id="reportTable">
+<thead>
+<tr>
+  <th rowspan="2">S.No</th>
+  <th rowspan="2">Staff Name</th>
+  <th colspan="3">Site Visit</th>
+  <th rowspan="2">Target Sq.ft</th>
+  <th colspan="3">Overall Booking</th>
+</tr>
+<tr>
+  <th>Below 8</th>
+  <th>Above 8</th>
+  <th>Total</th>
+  <th>Count</th>
+  <th>Sqft</th>
+  <th>%</th>
+</tr>
+</thead>
+<tbody></tbody>
+<tfoot></tfoot>
+</table>
+
+</div>
+<script>
+const CSV_BOOKING = "https://nijannfbd7890.github.io/Site-visit/workbook.csv";
+const CSV_VISIT   = "https://nijannfbd7890.github.io/Site-visit/SITE_VISIT.csv";
+
+/* Normalize staff names for exact matching */
+function normalizeName(name) {
+  return name
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/\b(mr|ms|sir|madam)\b/g, "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+function applyFilter() {
+  loadStaffAndVisits();
+}
+
+function loadStaffAndVisits() {
+
+  Papa.parse(CSV_BOOKING, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function (bookingRes) {
+
+      const staffMap = {};      // Staff → counts
+      const staffKeyMap = {};   // normalized → staff name
+
+      /* 1️⃣ MASTER STAFF LIST */
+      bookingRes.data.forEach(row => {
+        const staffName =
+          row["STAFF NAME"] ||
+          row["Staff Name"] ||
+          row["staff name"] ||
+          row["Staff_Name"];
+
+        if (!staffName) return;
+
+        const displayName = staffName.trim();
+        const key = normalizeName(displayName);
+
+        staffMap[displayName] = { below: 0, above: 0 };
+        staffKeyMap[key] = displayName;
+      });
+
+      /* 2️⃣ SITE VISIT COUNTS */
+		Papa.parse(CSV_VISIT, {
+  download: true,
+  header: true,
+  skipEmptyLines: true,
+  complete: function (visitRes) {
+
+    visitRes.data.forEach(row => {
+
+      const visitStaff = row["TELE MARKETING STAFF NAME"];
+      const visitValue = Number(row["RANGE"]);
+
+      if (!visitStaff || isNaN(visitValue)) return;
+
+      const visitKey = normalizeName(visitStaff);
+	  
+	  console.log("SITE VISIT HEADERS:", Object.keys(visitRes.data[0]));
+
+
+      let matchedStaff = null;
+      for (const key in staffKeyMap) {
+        if (key.includes(visitKey) || visitKey.includes(key)) {
+          matchedStaff = staffKeyMap[key];
+          break;
+        }
+      }
+
+      if (!matchedStaff) return;
+
+      if (visitValue < 8) {
+        staffMap[matchedStaff].below++;
+      } else {
+        staffMap[matchedStaff].above++;
+      }
+    });
+
+    renderStaffTable(staffMap);
+  }
+});
+
+
+    }
+  });
+}
+
+function renderStaffTable(staffMap) {
+  const tbody = document.querySelector("#reportTable tbody");
+  const tfoot = document.querySelector("#reportTable tfoot");
+
+  tbody.innerHTML = "";
+  tfoot.innerHTML = "";
+
+  let index = 1;
+  let totalBelow = 0;
+  let totalAbove = 0;
+
+  Object.entries(staffMap).forEach(([name, data]) => {
+    const total = data.below + data.above;
+    totalBelow += data.below;
+    totalAbove += data.above;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${index++}</td>
+        <td>${name}</td>
+        <td>${data.below}</td>
+        <td>${data.above}</td>
+        <td>${total}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>`;
+  });
+
+  tfoot.innerHTML = `
+    <tr>
+      <td colspan="2">Grand Total</td>
+      <td>${totalBelow}</td>
+      <td>${totalAbove}</td>
+      <td>${totalBelow + totalAbove}</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0%</td>
+    </tr>`;
+
+  document.getElementById("svBelow").textContent = totalBelow;
+  document.getElementById("svAbove").textContent = totalAbove;
+  document.getElementById("svTotal").textContent = totalBelow + totalAbove;
+}
+
+window.onload = applyFilter;
+</script>
+</body>
+</html>
