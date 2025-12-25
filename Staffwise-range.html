@@ -100,8 +100,212 @@ nav a.active {
 <tbody></tbody>
 <tfoot></tfoot>
 </table>
+<script>
 
-</div>
+const CSV_BOOKING = "https://nijannfbd7890.github.io/Site-visit/workbook.csv";
+const CSV_VISIT   = "https://nijannfbd7890.github.io/Site-visit/SITE_VISIT.csv";
 
+
+// STEP 1: Staff master list (as provided)
+const staffMaster = [
+  { name: "Mr.N.Sakthivel Sir", target: 1400 },
+  { name: "Mr.E.Praveen sir", target: 2200 },
+  { name: "Mr.K.Gowtham Sir", target: 2200 },
+  { name: "Mr.S.Selvaraj sir", target: 2200 },
+  { name: "Mrs.B.Preethi madam", target: 2000 },
+  { name: "Mr.S.Srikanth Sir", target: 1700 },
+  { name: "Mrs.R.Gowthamarani Madam", target: 1400 },
+  { name: "Mr.E.Ilayaraja Sir", target: 1700 },
+  { name: "Mrs.S.Sneka Madam", target: 2000 },
+  { name: "Mr.A.Arun sir", target: 2200 },
+  { name: "Mr.A.Sugunesh sir", target: 2200 },
+  { name: "Mr.N.Parthiban Sir", target: 1400 },
+  { name: "Mrs.Gomathi madam", target: 2000 },
+  { name: "Mr.S.Govindan Sir", target: 2200 },
+  { name: "Mrs.J.Pavithra madam", target: 1400 },
+  { name: "Mr.S.Karthikeyan sir", target: 2200 },
+  { name: "Mr.K.Thamizharasan Sir", target: 1700 },
+  { name: "Mr.M.Siva Sir", target: 1700 },
+  { name: "Ms.S.Sandhiya Madam", target: 2000 },
+  { name: "Mr.M.Thirunavukkarasu Sir", target: 2200 },
+  { name: "Mr.C.Vijayan sir", target: 2200 },
+  { name: "Mr.J.Ajith Kumar sir", target: 2200 },
+  { name: "Mr.R.Vignesh sir", target: 1200 },
+  { name: "Mr.E.Siva sir", target: 1700 },
+  { name: "Mr.A.Kannadhasan sir", target: 2200 },
+  { name: "Mr.A.Rajkumar sir", target: 2200 },
+  { name: "Mrs.Sathiya Madam", target: 1400 },
+  { name: "Mrs.T.Prabhavathi madam", target: 2000 },
+  { name: "Mrs.D.Srividhiya Madam", target: 2000 },
+  { name: "Mr.P.Suresh Sir", target: 1200 },
+  { name: "Mr.A.Praveen kumar sir", target: 2200 },
+  { name: "Ms.P.Ramya Madam", target: 1400 },
+  { name: "Mr.A.Rajadurai sir", target: 2200 },
+  { name: "Mr.A.Sakthimurugan Sir", target: 1400 },
+  { name: "Mr.P.B.Anthony Raj sir", target: 1400 },
+  { name: "Mrs.B.Jayalakshmi madam", target: 2000 },
+  { name: "Mr.E.Mugil Vanan sir", target: 1400 },
+  { name: "Mr.M.Balamuthu Sir", target: 1700 },
+  { name: "Mr.M.Jayasuriya sir", target: 2200 },
+  { name: "Mr.M.Chinnadurai Sir", target: 1400 },
+  { name: "Mr.A.Arockiya Prabakaran Sir", target: 1400 },
+  { name: "Mr.M.Ezhumalai Sir", target: 1700 },
+  { name: "Mr.A.Manikandan Sir", target: 2200 },
+  { name: "Mr.A.G.Vinayagam Sir", target: 1700 },
+  { name: "Mr.A.Ayyappan Sir", target: 1700 },
+  { name: "Mr.L.Sathish Sir", target: 1700 },
+  { name: "Mr.R.Jeeva sir", target: 1700 },
+  { name: "Mr.K.Ayyappan sir", target: 1700 },
+  { name: "Mr.B.Prakash Sir", target: 1700 },
+  { name: "Mr.P.Govinthan Sir", target: 1200 },
+  { name: "Mr.P.Vignesh Sir", target: 1200 },
+  { name: "Mr.A.Madhavan Sir", target: 1200 },
+  { name: "Mr.S.Jayamani Sir", target: 1200 },
+  { name: "Mr.A.Iyyappaan Sir", target: 1200 },
+  { name: "Mr.B.Ajith Kumar Sir", target: 1200 },
+  { name: "Mr.K.Tharun Sir", target: 1200 },
+  { name: "Mr.P.Dineshkumar sir", target: 1200 },
+  { name: "Mr.G.Manikandan sir", target: 1200 },
+  { name: "Mr.M.Selvam Sir", target: 1200 },
+  { name: "Ms.S.Meera sri madam", target: 2000 },
+  { name: "Ms.C.Keerthana Madam", target: 1400 },
+  { name: "Ms.Thirushna madam", target: 1400 },
+  { name: "Ms.P.Bhavani Madam", target: 1400 },
+  { name: "Ms.P.Parameshwari mam", target: 1400 },
+  { name: "Ms.M.Kayalvizhi", target: 1400 },
+  { name: "Mrs.Keerthana Mam", target: 1400 },
+  { name: "Ms.M.Jayasri Madam", target: 1400 },
+  { name: "Mr.P.Ramesh sir", target: 2200 },
+  { name: "Mr.S.Manikandan sir", target: 2200 },
+  { name: "Mr.P.Santhana Krishnan sir", target: 2200 },
+  { name: "Mr.K.Prakash sir", target: 2200 },
+  { name: "Mr.R.Shawn michael sir", target: 2200 },
+  { name: "Mr.J.Ayyappan sir", target: 2200 },
+  { name: "Mr.G.Muthupandi Raja sir", target: 2200 },
+  { name: "Mr.R.Sathish Kumar Sir", target: 1400 },
+  { name: "Mr.S.Janarthanam Sir", target: 2200 },
+  { name: "Mr.P.Lakshmanan Sir", target: 1400 },
+  { name: "Mr.J.Clement Antony Raj Sir", target: 1400 },
+  { name: "Mr.J.Thamizharasan sir", target: 1400 },
+  { name: "Mr.A.Prabhu sir", target: 1400 },
+  { name: "Mr.S.Karthi Sir", target: 1400 },
+  { name: "Mr.G.Nandhakumar sir", target: 1400 }
+];
+
+
+function normalizeName(name) {
+  return name
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/\b(mr|mrs|ms|sir|madam|mam)\b/g, "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+
+
+// Render staff table (STEP 1)
+
+function renderStaffMaster() {
+  const tbody = document.querySelector("#reportTable tbody");
+  const tfoot = document.querySelector("#reportTable tfoot");
+
+  tbody.innerHTML = "";
+  tfoot.innerHTML = "";
+
+  let totalTarget = 0;
+
+  staffMaster.forEach((staff, index) => {
+    totalTarget += staff.target;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${staff.name}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>${staff.target}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+    `;
+  });
+
+  // ✅ GRAND TOTAL ROW
+  tfoot.innerHTML = `
+    <tr>
+      <td colspan="5">Grand Total</td>
+      <td>${totalTarget}</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0%</td>
+    </tr>
+  `;
+}
+
+
+
+function loadSiteVisits() {
+
+  Papa.parse("CSV_VISIT.csv", {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function (result) {
+
+      const visitData = result.data;
+      const tbodyRows = document.querySelectorAll("#reportTable tbody tr");
+
+      let totalBelow = 0;
+      let totalAbove = 0;
+
+      tbodyRows.forEach(row => {
+
+        const staffName = row.children[1].innerText;
+        const staffKey = normalizeName(staffName);
+
+        let below = 0;
+        let above = 0;
+
+        visitData.forEach(v => {
+          const visitStaff = v["TELE MARKETING STAFF NAME"];
+          const visitRange = Number(v["RANGE"]);
+
+          if (!visitStaff || isNaN(visitRange)) return;
+
+          if (normalizeName(visitStaff) === staffKey) {
+            if (visitRange < 8) below++;
+            else above++;
+          }
+        });
+		console.log("CSV HEADERS:", Object.keys(result.data[0]));
+
+        row.children[2].innerText = below;
+        row.children[3].innerText = above;
+        row.children[4].innerText = below + above;
+
+        totalBelow += below;
+        totalAbove += above;
+      });
+
+      // Summary update
+      document.getElementById("svBelow").innerText = totalBelow;
+      document.getElementById("svAbove").innerText = totalAbove;
+      document.getElementById("svTotal").innerText = totalBelow + totalAbove;
+    }
+  });
+}
+
+
+
+// Auto load on page open
+window.onload = function () {
+  renderStaffMaster();
+  loadSiteVisits();
+};
+
+</script>
 </body>
 </html>
